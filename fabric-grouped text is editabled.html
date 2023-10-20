@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    Floor Plan
+  </title>
+  <style type="text/css">
+    body {
+      margin: 0;
+    }
+
+    #canvas {
+      background-color: white;
+      width: 100%;
+      height: 100%;
+      border: 1px solid #333;
+    }
+  </style>
+
+  <!-- Loading the FabricJS library -->
+  <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+  
+</head>
+
+<body>
+  <h4>fabricjs editing textbox inside fabric Group</h4>
+  <canvas id="canvas"></canvas>
+  <button onclick="ungroup()">rename</button>
+  
+  <script>
+    var canvas = new fabric.Canvas('canvas');
+    var items = [];
+    canvas.setWidth(800);
+    canvas.setHeight(400);
+    fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
+      return {
+        left: object.left + this._offset.left,
+        top: object.top + this._offset.top
+      };
+    }
+
+    function zoomout(){
+      this.zoomToPoint(new fabric.Point(0, 0), value);
+      return this;
+    }
+
+    function ungroup(){
+      var groups = canvas.getObjects();
+      var group = canvas.getActiveObject();
+      groups.forEach((item) => {
+        console.log('all group');
+        item.evented = false;
+        console.log('all group');
+      })
+      var items = group.getObjects();
+      console.log(items);
+      group.destroy();
+      canvas.remove(group);
+      items[0].hasControls = false;
+      items[0].lockMovementX = true;
+      items[0].lockMovementY = true;
+      items[0].lockMovementY = true;
+      canvas.setActiveObject(items[0]);
+      items[1].hasControls = false;
+      items[1].lockMovementX = true;
+      items[1].lockMovementY = true;
+      items[1].editable = true;
+      items[1].enterEditing();
+      canvas.setActiveObject(items[1]);
+      canvas.add.apply(canvas, items);
+      canvas.renderAll();
+    }
+
+    canvas.on('selection:created', (e) => {
+      console.log('selection:created');
+      console.log(e)
+    })
+
+    canvas.on('selection:created', (e) => {
+      console.log('selection:created');
+      console.log(e)
+    })
+
+    canvas.on("text:changed", (e) => {
+      // var t1 = e.target;
+      // console.log(e.target);
+      // if (t1.width > t1.fixedWidth) {
+      //   t1.fontSize *= t1.fixedWidth / (t1.width + 1);
+      //   t1.width = t1.fixedWidth;
+      // }
+    })
+
+    canvas.on('selection:cleared', (e) => {
+      canvas.renderAll();
+      console.log('selection:cleared');
+      console.log(e)
+    })
+
+
+    // function rename(){
+    //   var group = canvas.getActiveObject();
+    //   group.lockMovementX = true;
+    //   group.lockMovementY = true;
+    //   group._objects[1].lockMovementY = true;
+    //   console.log(group._objects[0].height);
+    //   let textForEditing = new fabric.Textbox(group._objects[1].text, {
+    //       originX: 'center',
+    //       top:  group.top + group._objects[0].height / 2 - group._objects[1].fontSize / 2,
+    //       textAlign: group._objects[1].textAlign,
+    //       fontSize: group._objects[1].fontSize,
+    //       left: group.left,
+    //       // top: group.top,
+    //       // lockMovementX : true,
+    //       // lockMovementY : true,
+    //     })
+        
+    //     // hide group inside text
+    //     group._objects[1].visible = false;
+    //     // note important, text cannot be hidden without this
+    //     group.addWithUpdate();
+        
+    //     textForEditing.visible = true;
+    //     // do not give controls, do not allow move/resize/rotation on this 
+    //     textForEditing.hasConstrols = false;
+
+        
+    //     // now add this temporary obj to canvas
+    //     canvas.add(textForEditing);
+    //     canvas.setActiveObject(textForEditing);
+    //     // make the cursor showing
+    //     textForEditing.enterEditing();
+    //     textForEditing.selectAll();
+        
+        
+    //     // editing:exited means you click outside of the textForEditing
+    //     group.on('selection:created', () => {
+    //         group.lockMovementX = false;
+    //         group.lockMovementY = false;
+    //     })
+    //     textForEditing.on('editing:exited', () =>{
+    //         let newVal = textForEditing.text;
+    //       let oldVal = group._objects[1].text;
+          
+    //       // then we check if text is changed
+    //       if (newVal !== oldVal) {
+    //         group._objects[1].set({
+    //             text: newVal,
+    //             visible: true,
+    //         })
+            
+    //         // comment before, you must call this
+    //         group.addWithUpdate();
+    //         group.lockMovementX = false;
+    //         group.lockMovementY = false;
+            
+    //         // we do not need textForEditing anymore
+    //         textForEditing.visible = false;
+    //         canvas.remove(textForEditing);
+            
+    //         // optional, buf for better user experience
+    //         canvas.setActiveObject(group);
+    //       }
+    //     })
+    // }
+
+    function createGroup() {
+        let rect = new fabric.Rect({
+        width: 100,
+        height: 200,
+        fill: '#000',
+        left: 0, 
+        top: 0,
+        name: "test"
+      });
+      
+      let text = new fabric.IText("xxxxx", {
+        left: rect.left / 2,
+        top:  rect.height + 20,
+        textAlign: 'center',
+        fontSize: 30,
+        width: rect.width,
+        fixedWidth: rect.width,
+        name: "test"
+      })
+      
+      let group = new fabric.Group([rect, text], {
+        left: 100,
+        top: 100,
+        originX: 'center',
+        originY: 'center',
+      });
+
+      // group.on('mousedblclick', () => {
+      //   // textForEditing is temporary obj, 
+      //   // and will be removed after editing
+      //   console.log('text.text', text.text);
+      //   let textForEditing = new fabric.Textbox(text.text, {
+      //     originX: 'center',
+      //     originY: 'center',
+      //     textAlign: text.textAlign,
+      //     fontSize: text.fontSize,
+          
+      //     left: group.left,
+      //     top: group.top,
+      //   })
+        
+      //   // hide group inside text
+      //   text.visible = false;
+      //   // note important, text cannot be hidden without this
+      //   group.addWithUpdate();
+        
+      //   textForEditing.visible = true;
+      //   // do not give controls, do not allow move/resize/rotation on this 
+      //   textForEditing.hasConstrols = false;
+
+        
+      //   // now add this temporary obj to canvas
+      //   canvas.add(textForEditing);
+      //   canvas.setActiveObject(textForEditing);
+      //   // make the cursor showing
+      //   textForEditing.enterEditing();
+      //   textForEditing.selectAll();
+        
+        
+      //   // editing:exited means you click outside of the textForEditing
+      //   textForEditing.on('editing:exited', () =>{
+      //       let newVal = textForEditing.text;
+      //     let oldVal = text.text;
+          
+      //     // then we check if text is changed
+      //     if (newVal !== oldVal) {
+      //       text.set({
+      //           text: newVal,
+      //         visible: true,
+      //       })
+            
+      //       // comment before, you must call this
+      //       group.addWithUpdate();
+            
+      //       // we do not need textForEditing anymore
+      //       textForEditing.visible = false;
+      //       canvas.remove(textForEditing);
+            
+      //       // optional, buf for better user experience
+      //       canvas.setActiveObject(group);
+      //     }
+      //   })
+      // })
+
+      group.on('rotating', () => {
+        console.log("rotating");
+        group._objects[1].set('lockRotation', true);
+      })
+
+      canvas.on('text:editing', () => {
+        console.log('text:editing');
+      })
+
+      canvas.on('object:modified', () => {
+        console.log('text:editing');
+      })
+      
+      canvas.add(group);
+    }
+
+  createGroup();
+  createGroup();
+  </script>
+</body>
+
+</html>

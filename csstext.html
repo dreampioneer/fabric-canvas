@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title of the document</title>
+    <style>
+      div {
+        background-color: #1c87c9;
+        color: #fff;
+        padding: 5px;
+        width: 15vw;
+      }
+      p {
+      	white-space: nowrap;
+      	@media (min-width: 10vw) {
+	        animation: marquee 10s linear infinite;
+      	 }
+      }
+      @keyframes marquee {
+        0% {
+          -moz-transform: translateX(100%);
+          -webkit-transform: translateX(100%);
+          transform: translateX(100%)
+        }
+        100% {
+          -moz-transform: translateX(-100%);
+          -webkit-transform: translateX(-100%);
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p>This is a horizontally scrolling text without a marquee tag.</p>
+      <p>This is a horizontally</p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    Floor Plan
+  </title>
+  <style type="text/css">
+      [draggable] {
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -khtml-user-drag: element;
+        -webkit-user-drag: element;
+        cursor: move;
+    }
+  </style>
+
+  <!-- Loading the FabricJS library -->
+  <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>
+  
+</head>
+
+<body>
+  <div class="fullpage">
+      <div class="section">
+        <div class="canvas-container" data-floorplan="https://via.placeholder.com/500x200/448844/fff">
+          <canvas></canvas>
+        </div>
+        <div class="furniture">
+          <img src="https://via.placeholder.com/50x50/848/fff">
+        </div>
+      </div>
+    </div>
+  
+  <script>
+    function initCanvas() {
+        $('.canvas-container').each(function(index) {
+            var canvasContainer = $(this)[0];
+            var canvasObject = $("canvas", this)[0];
+            var url = $(this).data('floorplan');
+            var canvas = window._canvas = new fabric.Canvas(canvasObject);
+
+            canvas.setHeight(200);
+            canvas.setWidth(500);
+            canvas.setBackgroundImage(url, canvas.renderAll.bind(canvas));
+            
+            var imageOffsetX, imageOffsetY;
+
+            canvas.on('object:moving', function(e) {
+                console.log('object:moving');
+                console.log(e);
+            });
+
+            canvas.on('object:selected', function(e) {
+                console.log('object:selected');
+                console.log(e);
+            });
+            
+
+            function handleDragStart(e) {
+                [].forEach.call(images, function (img) {
+                    img.classList.remove('img_dragging');
+                });
+                this.classList.add('img_dragging');
+              
+              
+                var imageOffset = $(this).offset();
+                console.log(imageOffset);
+                console.log(e);
+                imageOffsetX = e.touches[0].clientX - imageOffset.left;
+                imageOffsetY = e.touches[0].clientY - imageOffset.top;
+                console.log('handleDragStart');
+                console.log(imageOffsetX);
+                console.log(imageOffsetY);
+            }
+
+            function handleDragOver(e) {
+                console.log('handleDragOver');
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.dataTransfer.dropEffect = 'copy';
+                return false;
+            }
+
+            function handleDragEnter(e) {
+                console.log('handleDragEnter');
+                this.classList.add('over');
+            }
+
+            function handleDragLeave(e) {
+                console.log('handleDragLeave');
+                this.classList.remove('over');
+            }
+
+            function handleDrop(e) {
+                console.log('handleDrop');
+                e = e || window.event;
+                if (e.preventDefault) {
+                  e.preventDefault();
+                }
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                }
+                var img = document.querySelector('.furniture img.img_dragging');
+                console.log('event: ', e);
+              
+                var offset = $(canvasObject).offset();
+
+                var y = e.clientY - (offset.top + imageOffsetY);
+                var x = e.clientX - (offset.left + imageOffsetX);
+              
+                var newImage = new fabric.Image(img, {
+                    width: img.width,
+                    height: img.height,
+                    left: x,
+                    top: y,
+                    padding: 4,
+                    borderColor: 'black',
+                    cornerColor: 'white',
+                    cornerStrokeColor: 'black',
+                    transparentCorners: false,
+                    cornerSize: 6,
+                    rotatingPointOffset: 16
+                });
+                canvas.add(newImage);
+                return false;
+            }
+
+            function handleDragEnd(e) {
+                [].forEach.call(images, function (img) {
+                    img.classList.remove('img_dragging');
+                });
+                console.log('handleDragEnd');
+                console.log(imageOffsetX);
+                console.log(imageOffsetY);
+            }
+
+            function touchstart() {
+                console.log('touchstart');
+            }
+
+            function touchmove() {
+                console.log('touchmove');
+            }
+
+            function touchend() {
+                console.log('touchend');
+            }
+          
+          var images = document.querySelectorAll('.furniture img');
+          [].forEach.call(images, function (img) {
+            img.addEventListener('touchstart', handleDragStart, false);
+            img.addEventListener('touchend', handleDragEnd, false);
+          });
+          canvasContainer.addEventListener('touchstart', touchstart, false);
+          canvasContainer.addEventListener('touchmove', touchmove, false);
+          canvasContainer.addEventListener('touchend', touchend, false);
+        });
+    }
+    initCanvas();
+
+  </script>
+</body>
+
+</html>
